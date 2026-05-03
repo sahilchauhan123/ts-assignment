@@ -61,7 +61,7 @@ func (f *fakeDB) CreateLesson(name string, subjectID int) error {
 	return f.createLessonErr
 }
 
-func (f *fakeDB) GetLessons() ([]types.Lesson, error) {
+func (f *fakeDB) GetLessons(subjectId int) ([]types.Lesson, error) {
 	return f.lessons, nil
 }
 
@@ -167,7 +167,7 @@ func TestCreateSubjectHandler(t *testing.T) {
 
 func TestGetSubjectsHandler(t *testing.T) {
 	f := &fakeDB{subjects: []types.Subject{{ID: 5, Name: "Algebra"}}}
-	w, _ := runTestRequest(t, GetSubjects(f), http.MethodGet, "/subject/5", "", gin.Param{Key: "id", Value: "5"})
+	w, _ := runTestRequest(t, GetSubjects(f), http.MethodGet, "/subjects/5", "", gin.Param{Key: "course_id", Value: "5"})
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d", w.Code)
@@ -200,7 +200,7 @@ func TestCreateLessonHandler(t *testing.T) {
 
 func TestGetLessonsHandler(t *testing.T) {
 	f := &fakeDB{lessons: []types.Lesson{{ID: 11, Name: "Lesson 1", SubjectID: 7}}}
-	w, _ := runTestRequest(t, GetLessons(f), http.MethodGet, "/lesson", "")
+	w, _ := runTestRequest(t, GetLessons(f), http.MethodGet, "/lesson/7", "", gin.Param{Key: "subject_id", Value: "7"})
 
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d", w.Code)

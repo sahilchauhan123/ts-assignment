@@ -23,10 +23,11 @@ type Student struct {
 }
 
 type LessonCompletion struct {
-	ID          int  `json:"id"`
-	StudentID   int  `json:"student_id"`
-	LessonID    int  `json:"lesson_id"`
-	IsCompleted bool `json:"is_completed,omitempty"`
+	ID          int    `json:"id"`
+	StudentID   int    `json:"student_id"`
+	LessonID    int    `json:"lesson_id"`
+	LessonName  string `json:"lesson_name,omitempty"`
+	IsCompleted bool   `json:"is_completed,omitempty"`
 }
 
 type SubjectProgress struct {

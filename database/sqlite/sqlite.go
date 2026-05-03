@@ -112,8 +112,8 @@ func (s *Sqlite) CreateSubject(name string, courseID int) error {
 	return err
 }
 
-func (s *Sqlite) GetSubjects(subjectId int) ([]types.Subject, error) {
-	rows, err := s.db.Query("SELECT id, name FROM subjects WHERE id = ?", subjectId)
+func (s *Sqlite) GetSubjects(courseId int) ([]types.Subject, error) {
+	rows, err := s.db.Query("SELECT id, name FROM subjects WHERE course_id = ?", courseId)
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +135,8 @@ func (s *Sqlite) CreateLesson(name string, subjectID int) error {
 	return err
 }
 
-func (s *Sqlite) GetLessons() ([]types.Lesson, error) {
-	rows, err := s.db.Query("SELECT id, name, subject_id FROM lessons")
+func (s *Sqlite) GetLessons(subjectId int) ([]types.Lesson, error) {
+	rows, err := s.db.Query("SELECT id, name, subject_id FROM lessons WHERE subject_id = ?", subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -185,10 +185,11 @@ func (s *Sqlite) GetLessonsProgressOfStudent(studentID int) ([]types.SubjectProg
 	rows, err := s.db.Query(`
 		SELECT subjects.id AS subject_id,
 		       lessons.id AS lesson_id,
+		       lessons.name AS lesson_name,
 		       lc.id AS completion_id
 		FROM students
 		JOIN subjects ON subjects.course_id = students.course_id
-		LEFT JOIN lessons ON lessons.subject_id = subjects.id
+		LEFT JOIN lessons ON lessons.subject_id = subjects.id 
 		LEFT JOIN lesson_completions lc ON lc.lesson_id = lessons.id AND lc.student_id = ?
 		WHERE students.id = ?
 		ORDER BY subjects.id, lessons.id
@@ -202,8 +203,9 @@ func (s *Sqlite) GetLessonsProgressOfStudent(studentID int) ([]types.SubjectProg
 	for rows.Next() {
 		var subjectID int
 		var lessonID sql.NullInt64
+		var lessonName sql.NullString
 		var completionID sql.NullInt64
-		if err := rows.Scan(&subjectID, &lessonID, &completionID); err != nil {
+		if err := rows.Scan(&subjectID, &lessonID, &lessonName, &completionID); err != nil {
 			return nil, err
 		}
 
@@ -225,6 +227,7 @@ func (s *Sqlite) GetLessonsProgressOfStudent(studentID int) ([]types.SubjectProg
 			ID:          0,
 			StudentID:   studentID,
 			LessonID:    int(lessonID.Int64),
+			LessonName:  lessonName.String,
 			IsCompleted: completionID.Valid && completionID.Int64 != 0,
 		}
 		if completionID.Valid {

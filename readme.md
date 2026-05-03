@@ -4,7 +4,10 @@ things you can do
 Create,Read
     Courses,
     Subjects,
+    Students,
     Lessons,
     Lessons_completions,
 
-and also can progress of every subjects
+and also you can progress of every subjects lesson wise 
+
+use gin,sqlite 

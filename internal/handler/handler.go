@@ -73,12 +73,12 @@ func CreateSubject(db database.Db) gin.HandlerFunc {
 
 func GetSubjects(db database.Db) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		subjectId, err := strconv.Atoi(c.Param("id"))
+		courseId, err := strconv.Atoi(c.Param("course_id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, map[string]any{"error": "Invalid subject ID"})
+			c.JSON(http.StatusBadRequest, map[string]any{"error": "Invalid Course ID"})
 			return
 		}
-		subjects, err := db.GetSubjects(subjectId)
+		subjects, err := db.GetSubjects(courseId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, map[string]any{"error": err.Error()})
 			return
@@ -109,7 +109,12 @@ func CreateLesson(db database.Db) gin.HandlerFunc {
 
 func GetLessons(db database.Db) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		lessons, err := db.GetLessons()
+		subjectId, err := strconv.Atoi(c.Param("subject_id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, map[string]any{"error": "Invalid Subject ID"})
+			return
+		}
+		lessons, err := db.GetLessons(subjectId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, map[string]any{"error": err.Error()})
 			return
