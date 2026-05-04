@@ -14,3 +14,4 @@ used
     -go
     -gin
     -sqlite
+    -torsoDb
